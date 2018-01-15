@@ -384,7 +384,7 @@ trait DocumentoVenta
             return $this->saveInsert();
         }
 
-        return false;
+        return FALSE;
     }
 
     /**

@@ -74,7 +74,7 @@ class EditPageOption extends Base\Controller
     {
         $this->selectedViewName = $this->request->get('code');
         $this->selectedUser = $this->user->admin
-            ? $this->request->get('nick', null)
+            ? $this->request->get('nick', NULL)
             : $this->user->nick;
     }
 
@@ -98,6 +98,19 @@ class EditPageOption extends Base\Controller
     }
 
     /**
+     * Where filter for loading the view to be edited
+     *
+     * @return DatabaseWhere[]
+     */
+    private function getFilter()
+    {
+        return [
+            new DataBaseWhere('name', $this->selectedViewName),
+            new DataBaseWhere('user', $this->selectedUser)
+        ];
+    }
+
+    /**
      * Checking the value of the nick field.
      * It determines if we edit a configuration for all the users or one,
      * and if there is already configuration for the nick
@@ -105,12 +118,12 @@ class EditPageOption extends Base\Controller
     private function checkNickAndID()
     {
         if ($this->model->nick != $this->selectedUser) {
-            $this->model->id = null;
-            $this->model->nick = empty($this->selectedUser) ? null : $this->selectedUser;
+            $this->model->id = NULL;
+            $this->model->nick = empty($this->selectedUser) ? NULL : $this->selectedUser;
         }
 
         if ($this->model->nick === "") {
-            $this->model->nick = null;
+            $this->model->nick = NULL;
         }
     }
 

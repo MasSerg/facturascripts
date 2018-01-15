@@ -19,7 +19,6 @@
 
 namespace FacturaScripts\Core\Base;
 
-use FacturaScripts\Core\Lib\MenuItem;
 use FacturaScripts\Core\Model;
 
 /**
@@ -104,7 +103,7 @@ class MenuManager
     private function pageNeedSave($pageModel, $pageData)
     {
         return (
-            ($pageModel->menu !== $pageData['menu']) || ($pageModel->submenu !== $pageData['submenu']) ||
+            ($pageModel->menu !== $pageData['menu']) || ($pageModel->submenu !== $pageData['submenu']) || 
             ($pageModel->title !== $pageData['title']) || ($pageModel->icon !== $pageData['icon']) ||
             ($pageModel->showonmenu !== $pageData['showonmenu'])
         );
@@ -166,7 +165,7 @@ class MenuManager
             if ($menuItem->name === $pageModel->name) {
                 $menu[$key]->active = true;
                 break;
-            } elseif (!empty($pageModel->submenu) && !empty($menuItem->menu) && $menuItem->name === $pageModel->submenu) {
+            } else if(!empty($pageModel->submenu) && !empty($menuItem->menu) && $menuItem->name === $pageModel->submenu) {
                 $menu[$key]->active = true;
                 $this->setActiveMenuItem($menu[$key]->menu, $pageModel);
                 break;
@@ -270,7 +269,7 @@ class MenuManager
      *
      * @param string $nick
      *
-     * @return Model\RoleAccess[]
+     * @return Model\RolAccess[]
      */
     private function getUserAccess($nick)
     {
@@ -278,7 +277,7 @@ class MenuManager
         $roleUserModel = new Model\RoleUser();
         $filter = [new DataBase\DataBaseWhere('nick', $nick)];
         foreach ($roleUserModel->all($filter) as $roleUser) {
-            foreach ($roleUser->getRoleAccess() as $roleAccess) {
+            foreach($roleUser->getRoleAccess() as $roleAccess) {
                 $access[] = $roleAccess;
             }
         }

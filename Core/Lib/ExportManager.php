@@ -89,7 +89,7 @@ class ExportManager
         /// llamar a la clase apropiada para generar el archivo en función de la opción elegida
         $className = $this->getExportClassName($option);
         self::$engine = new $className();
-        self::$engine->newDoc($response);
+//        self::$engine->newDoc($response);
     }
 
     /**
@@ -100,6 +100,16 @@ class ExportManager
     public function show(&$response)
     {
         $response->setContent(self::$engine->getDoc());
+    }
+
+    /**
+     * Returns the formated data.
+     *
+     * @param Response $response
+     */
+    public function save(&$response)
+    {
+        return self::$engine->saveDoc();
     }
 
     /**

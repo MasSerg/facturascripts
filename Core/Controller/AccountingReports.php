@@ -1,7 +1,7 @@
 <?php
 /**
  * This file is part of FacturaScripts
- * Copyright (C) 2017-2018  Carlos Garcia Gomez  <carlos@facturascripts.com>
+ * Copyright (C) 2017  Carlos Garcia Gomez  <carlos@facturascripts.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -43,11 +43,11 @@ class AccountingReports extends Controller
 
     /**
      * Object to manager data export.
-     *
-     * @var ExportManager
+     * 
+     * @var ExportManager 
      */
     public $exportManager;
-
+    
     /**
      * Runs the controller's private logic.
      *
@@ -64,9 +64,7 @@ class AccountingReports extends Controller
         $this->exportManager = new ExportManager();
 
         $action = $this->request->get('action', '');
-        if ($action !== '') {
-            $this->execAction($action);
-        }
+        $this->execAction($action);
     }
 
     /**
@@ -104,28 +102,10 @@ class AccountingReports extends Controller
                 break;
         }
 
-        if (empty($data)) {
-            $this->miniLog->info($this->i18n->trans('no-data'));
-            return;
+        if (!empty($data)) {
+            $this->setTemplate(false);
+            $this->exportData($data, $format);
         }
-        
-        $this->setTemplate(false);
-        $this->exportData($data, $format);
-    }
-
-    /**
-     * Return list of accounting documents
-     *
-     * @return array
-     */
-    public function getReports()
-    {
-        return [
-            'libro-mayor' => 'ledger',
-            'sumas-saldos' => 'balance-ammounts',
-            'situacion' => 'balance-sheet',
-            'pyg' => 'profit-and-loss-balance'
-        ];
     }
 
     /**
@@ -145,7 +125,7 @@ class AccountingReports extends Controller
 
     /**
      * Exports data to PDF.
-     *
+     * 
      * @param array $data
      * @param string $format
      */

@@ -1,0 +1,93 @@
+{% extends "Master/MenuTemplate.html" %}
+
+{% block javascript %}
+{{ parent() }}
+
+<script type="text/javascript">
+$(document).ready(function(){
+    $("form").submit(function( event ){
+        validateMultipleEmailsCommaSeparated($('#bcc'),',');
+    });
+
+    function validateEmail(field) {
+        var regex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,5}$/;
+        return (regex.test(field)) ? true : false;
+    }
+    function validateMultipleEmailsCommaSeparated(email_field, seperator) {
+        var value = email_field.val();
+        if (value != '') {
+            var result = value.split(seperator);
+            for (var i = 0; i < result.length; i++) {
+                if (result[i] != '') {
+                    if (!validateEmail( $.trim(result[i]) )) {
+                        email_field.focus();
+                        event.preventDefault();
+                        alert("{{ i18n.trans('bcc-email-please-check') }}"+result[i]+"{{ i18n.trans('bcc-email-not-valid') }}");
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+});
+</script>
+
+{% endblock %}
+
+
+{% block body %}
+<!-- Macros Template Imports -->
+{% import 'Macro/Forms.html' as forms %}
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <h1>
+                <i class="fa fa-envelope-o" aria-hidden="true"></i> {{ i18n.trans('send-to-email-header') }}
+            </h1>
+            <hr/>
+        </div>
+    </div>
+
+    <form action="{{ fsc.url() }}&action=send" method="post" id="email-form" class="form">
+        <div class="row">
+            <div class="col-6">
+                <div class="form-group">
+                    {{ forms.simpleInput('from', 'from', fsc.from, 'email', i18n.trans('from-email'), 'fa-envelope-o') }}
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="form-group">
+                    {{ forms.simpleInput('name', 'name', fsc.name, 'text', i18n.trans('name-email'), 'fa-user') }}
+                </div>
+            </div>
+            <div class="col-12">
+                <div class="form-group">
+                    {{ forms.simpleInput('to', 'to', fsc.to, 'email', i18n.trans('to-email'), 'fa-envelope-o') }}
+                </div>
+                <div class="form-group">
+                    {{ forms.simpleInput('bcc', 'bcc', fsc.bcc, 'text', i18n.trans('bcc-email'), 'fa-envelope-o') }}
+                </div>
+                <div class="form-group">
+                    {{ forms.simpleInput('subject', 'subject', fsc.subject, '', i18n.trans('subject-email'), 'fa-tag') }}
+                </div>
+
+                <div class="form-group">
+                    {{ forms.simpleTextarea('text', 'text', fsc.text, i18n.trans('text-email'), 'fa-align-justify') }}
+                </div>
+                <div class="form-group">
+                    {{ forms.simpleInput('file', 'file', fsc.file, 'hidden', '', '') }}
+                    <a href="data/{{ fsc.file }}">
+                        <i class="fa fa-file-pdf-o" aria-hidden="true"></i> {{ fsc.file }}
+                    </a>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fa fa-floppy-o fa-fw" aria-hidden="true"></i>
+                    {{ i18n.trans('send-email-button') }}
+                </button>
+            </div>
+        </div>
+    </form>
+
+</div>
+{% endblock %}

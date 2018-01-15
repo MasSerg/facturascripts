@@ -81,7 +81,7 @@ class EditUser extends ExtendedController\PanelController
             case 'EditRoleUser':
                 $nick = $this->getViewModelValue('EditUser', 'nick');
                 $where = [new DataBaseWhere('nick', $nick)];
-                $view->loadData(false, $where);
+                $view->loadData($where);
                 break;
         }
     }
@@ -140,7 +140,7 @@ class EditUser extends ExtendedController\PanelController
         }
 
         /// sorting
-        usort($langs, function ($objA, $objB) {
+        usort($langs, function($objA, $objB) {
             return strcmp($objA['title'], $objB['title']);
         });
 

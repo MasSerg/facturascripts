@@ -1,7 +1,7 @@
 <?php
 /**
  * This file is part of FacturaScripts
- * Copyright (C) 2017-2018  Carlos Garcia Gomez  <carlos@facturascripts.com>
+ * Copyright (C) 2013-2017  Carlos Garcia Gomez  <carlos@facturascripts.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -20,7 +20,6 @@ namespace FacturaScripts\Core\Lib\ExtendedController;
 
 use FacturaScripts\Core\Base;
 use FacturaScripts\Core\Lib\ExportManager;
-use FacturaScripts\Core\Model\CodeModel;
 use FacturaScripts\Core\Model\User;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -39,13 +38,6 @@ abstract class PanelController extends Base\Controller
      * @var string
      */
     public $active;
-
-    /**
-     * Model to use with select and autocomplete filters.
-     * 
-     * @var CodeModel
-     */
-    private $codeModel;
 
     /**
      * Export data object
@@ -103,13 +95,12 @@ abstract class PanelController extends Base\Controller
     {
         parent::__construct($cache, $i18n, $miniLog, $className);
 
-        $this->active = $this->request->get('active', '');
-        $this->codeModel = new CodeModel();
         $this->exportManager = new ExportManager();
+        $this->setTemplate('Master/PanelController');
+        $this->active = $this->request->get('active', '');
+        $this->tabsPosition = 'left';
         $this->settings = [];
         $this->views = [];
-
-        $this->setTabsPosition('left');
     }
 
     /**
@@ -280,10 +271,9 @@ abstract class PanelController extends Base\Controller
     protected function execAfterAction($view, $action)
     {
         switch ($action) {
-            case 'autocomplete':
-                $this->autocompleteAction();
+            case 'insert':
+                $this->insertAction($view);
                 break;
-
             case 'export':
                 $this->setTemplate(false);
                 $this->exportManager->newDoc($this->response, $this->request->get('option'));
@@ -292,26 +282,41 @@ abstract class PanelController extends Base\Controller
                 }
                 $this->exportManager->show($this->response);
                 break;
-
-            case 'insert':
-                $this->insertAction($view);
+            case 'email':
+                $this->setTemplate(false);
+                $this->exportManager->newDoc($this->response, $this->request->get('option'));
+                $this->views[$this->active]->export($this->exportManager);
+                $file = $this->exportManager->save($this->response);
+                $this->response->headers->set('Refresh', '1; index.php?page=SendEmail&file='.$file);
                 break;
         }
     }
 
-    private function autocompleteAction()
+    protected function insertAction($view)
     {
-        $this->setTemplate(false);
-        $source = $this->request->get('source');
-        $field = $this->request->get('field');
-        $title = $this->request->get('title');
-        $term = $this->request->get('term');
-
-        $results = [];
-        foreach($this->codeModel->search($source, $field, $title, $term) as $value) {
-            $results[] = ['key' => $value->code, 'value' => $value->description];
+        $view->setNewCode();
+    }
+    
+    /**
+     * Run the data edits
+     *
+     * @param BaseView $view
+     *
+     * @return bool
+     */
+    protected function editAction($view)
+    {
+        if (!$this->permissions->allowUpdate) {
+            $this->miniLog->alert($this->i18n->trans('not-allowed-modify'));
+            return false;
         }
-        $this->response->setContent(json_encode($results));
+
+        if ($view->save()) {
+            $this->miniLog->notice($this->i18n->trans('record-updated-correctly'));
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -338,34 +343,6 @@ abstract class PanelController extends Base\Controller
     }
 
     /**
-     * Run the data edits
-     *
-     * @param BaseView $view
-     *
-     * @return bool
-     */
-    protected function editAction($view)
-    {
-        if (!$this->permissions->allowUpdate) {
-            $this->miniLog->alert($this->i18n->trans('not-allowed-modify'));
-            return false;
-        }
-
-        if ($view->save()) {
-            $this->miniLog->notice($this->i18n->trans('record-updated-correctly'));
-            return true;
-        }
-
-        $this->miniLog->error($this->i18n->trans('record-save-error'));
-        return false;
-    }
-
-    protected function insertAction($view)
-    {
-        $view->setNewCode();
-    }
-
-    /**
      * Check if the view should be active
      *
      * @param BaseView $view
@@ -387,7 +364,7 @@ abstract class PanelController extends Base\Controller
     private function addView($keyView, $view, $icon)
     {
         $this->views[$keyView] = $view;
-        $this->settings[$keyView] = ['active' => true, 'icon' => $icon];
+        $this->settings[$keyView] = ['active' => TRUE, 'icon' => $icon];
 
         if (empty($this->active)) {
             $this->active = $keyView;

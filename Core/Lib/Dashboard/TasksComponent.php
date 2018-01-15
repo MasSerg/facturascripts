@@ -62,7 +62,7 @@ class TasksComponent extends BaseComponent implements ComponentInterface
         return [
             'description' => '',
             'color' => 'info',
-            'enddate' => null,
+            'enddate' => NULL,
         ];
     }
 
@@ -110,7 +110,7 @@ class TasksComponent extends BaseComponent implements ComponentInterface
         }
 
         if ($this->randomData) {
-            $data['enddate'] = (mt_rand(0, 2) == 0) ? date('Y-m-d') : null;
+            $data['enddate'] = (mt_rand(0, 2) == 0) ? date('Y-m-d') : NULL;
         }
 
         $newItem->properties = [

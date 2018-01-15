@@ -252,7 +252,7 @@ trait DocumentoCompra
             return $this->saveInsert();
         }
 
-        return false;
+        return FALSE;
     }
 
     /**
@@ -303,7 +303,7 @@ trait DocumentoCompra
          * many decimals.
          */
         $this->totaleuros = round($this->total / $this->tasaconv, 5);
-        if (static::floatcmp($this->total, $this->neto + $this->totaliva - $this->totalirpf + $this->totalrecargo, FS_NF0, true)) {
+        if (static::floatcmp($this->total, $this->neto + $this->totaliva - $this->totalirpf + $this->totalrecargo, FS_NF0, TRUE)) {
             return true;
         }
 

@@ -5,7 +5,7 @@
      * Show the model data in format for editing.
      *
      * This file is part of FacturaScripts
-     * Copyright (C) 2013-2018  Carlos Garcia Gomez  <carlos@facturascripts.com>
+     * Copyright (C) 2013-2017  Carlos Garcia Gomez  <carlos@facturascripts.com>
      *
      * This program is free software: you can redistribute it and/or modify
      * it under the terms of the GNU Lesser General Public License as
@@ -36,6 +36,10 @@
 {{ parent() }}
 
 <script type="text/javascript">
+    function insertRecord() {
+        document.insert_form.submit();
+    }
+
     function deleteRecord() {
         bootbox.confirm({
             title: "{{ i18n.trans('confirm-delete')|raw }}",
@@ -57,27 +61,15 @@
             }
         });
     }
+
     function execActionForm(formName, actionValue) {
         var form = document.forms[formName];
         form.action.value = actionValue;
         form.submit();
     }
-    function insertRecord() {
-        document.insert_form.submit();
-    }
+
     $(document).ready(function () {
         $('#main_row :text:first').focus();
-        // autocomplete filters
-        $('.autocomplete').each(function() {
-            var field = $(this).attr('data-field');
-            $(this).autocomplete({
-                source: '{{ fsc.url() }}&action=autocomplete&source=' + $(this).attr('data-source')
-                        + '&field=' + field + '&title=' + $(this).attr('data-title'),
-                select: function(event, ui) {
-                    $('#' + field + 'Autocomplete').val(ui.item.key);
-                }
-            });
-        });
     });
 </script>
 {% endblock %}
@@ -110,7 +102,10 @@
 {# Visual macros #}
 {% from 'Macro/Utils.html' import popoverTitle as popoverTitle %}
 {% from 'Macro/Utils.html' import exportData as exportData %}
-{% import 'Macro/BaseController.html' as BaseController %}
+{% from 'Macro/BaseController.html' import columnsForEditView as columnsForEditView %}
+{% from 'Macro/BaseController.html' import rowStatisticsForEditView as rowStatisticsForEditView %}
+{% from 'Macro/BaseController.html' import rowCardsForEditView as rowCardsForEditView %}
+{% from 'Macro/BaseController.html' import modalFormFromColumns as modalFormFromColumns %}
 
 {# Aux Objects #}
 {% set model = fsc.view.getModel() %}
@@ -171,7 +166,7 @@
     <div id="data" class="row mt-2">
         <div class="col-12">
             {# Header Row #}
-            {{ BaseController.rowCardsForEditView(_context, fsc.view, 'header') }}
+            {{ rowCardsForEditView(_context, fsc.view, 'header') }}
 
             <form action="#" method="post" class="form" role="form" name="main_form">
                 <input type="hidden" name="action" value="save">
@@ -182,11 +177,11 @@
 
                     <div class="card-body">
                         {# Statistical buttons bar #}
-                        {{ BaseController.rowStatisticsForEditView(_context, fsc.view) }}
+                        {{ rowStatisticsForEditView(_context, fsc.view) }}
 
                         {# Main Form #}
                         <div id="main_row" class="row">
-                            {{ BaseController.columnsForEditView(_context, fsc.view, model, FALSE) }}
+                            {{ columnsForEditView(_context, fsc.view, model, FALSE) }}
                         </div>
                     </div>
 
@@ -205,9 +200,9 @@
     </div>
 
     {# Footer Row #}
-    {{ BaseController.rowCardsForEditView(_context, fsc.view, 'footer') }}
+    {{ rowCardsForEditView(_context, fsc.view, 'footer') }}
 
     {# Modals Forms #}
-    {{ BaseController.modalFormFromColumns(_context, fsc.view) }}
+    {{ modalFormFromColumns(_context, fsc.view) }}
 </div>
 {% endblock %}

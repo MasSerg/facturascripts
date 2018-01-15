@@ -1,7 +1,7 @@
 <?php
 /**
  * This file is part of FacturaScripts
- * Copyright (C) 2016-2018  Carlos Garcia Gomez  <carlos@facturascripts.com>
+ * Copyright (C) 2016-2017  Carlos Garcia Gomez  <carlos@facturascripts.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -212,7 +212,7 @@ class ModelDataGenerator
 
                 case 1:
                     $aux = explode(':', $art->descripcion);
-                    if (!empty($aux)) {
+                    if ($aux) {
                         $art->referencia = $this->tools->txt2codigo($aux[0], 18);
                     } else {
                         $art->referencia = $art->getNewReferencia();
@@ -261,18 +261,17 @@ class ModelDataGenerator
     public function articulosProveedor($max = 50)
     {
         $proveedores = $this->randomProveedores();
-        $articulos = $this->randomArticulos();
 
         for ($num = 0; $num < $max; ++$num) {
-            if(!isset($articulos[$num])) {
-                break;
+            if (mt_rand(0, 2) == 0 && $this->impuestos[0]->iva <= 10) {
+                shuffle($this->impuestos);
             }
-            
+
             $art = new Model\ArticuloProveedor();
-            $art->referencia = $articulos[$num]->referencia;
-            $art->refproveedor = (string) mt_rand(1, 99999999);
+            $art->referencia = mt_rand(1, 99999999);
+            $art->refproveedor = mt_rand(1, 99999999);
             $art->descripcion = $this->tools->descripcion();
-            $art->codimpuesto = $articulos[$num]->codimpuesto;
+            $art->codimpuesto = $this->impuestos[0]->codimpuesto;
             $art->codproveedor = $proveedores[$num]->codproveedor;
             $art->precio = $this->tools->precio(1, 49, 699);
             $art->dto = mt_rand(0, 80);
@@ -306,16 +305,34 @@ class ModelDataGenerator
             $agente->ciudad = $this->tools->ciudad();
             $agente->direccion = $this->tools->direccion();
             $agente->codpostal = (string) mt_rand(11111, 99999);
-            $agente->f_baja = (mt_rand(0, 24) == 0) ? date('d-m-Y') : null;
-            $agente->telefono = (mt_rand(0, 1) == 0) ? (string) mt_rand(555555555, 999999999) : '';
-            $agente->email = (mt_rand(0, 2) > 0) ? $this->tools->email() : '';
-            $agente->cargo = (mt_rand(0, 2) > 0) ? $this->tools->cargo() : '';
-            $agente->seg_social = (mt_rand(0, 1) == 0) ? (string) mt_rand(111111, 9999999999) : '';
-            $agente->porcomision = $this->tools->cantidad(0, 5, 20);
+
+            if (mt_rand(0, 24) == 0) {
+                $agente->f_baja = date('d-m-Y');
+            }
+
+            if (mt_rand(0, 1) == 0) {
+                $agente->telefono = (string) mt_rand(555555555, 999999999);
+            }
+
+            if (mt_rand(0, 2) > 0) {
+                $agente->email = $this->tools->email();
+            }
+
+            if (mt_rand(0, 2) > 0) {
+                $agente->cargo = $this->tools->cargo();
+            }
+
+            if (mt_rand(0, 1) == 0) {
+                $agente->seg_social = (string) mt_rand(111111, 9999999999);
+            }
 
             if (mt_rand(0, 5) == 0) {
                 $agente->banco = 'ES' . mt_rand(10, 99) . ' ' . mt_rand(1000, 9999) . ' ' . mt_rand(1000, 9999) . ' '
                     . mt_rand(1000, 9999) . ' ' . mt_rand(1000, 9999) . ' ' . mt_rand(1000, 9999);
+            }
+
+            if (mt_rand(0, 5) == 0) {
+                $agente->porcomision = $this->tools->cantidad(0, 5, 20);
             }
 
             if (!$agente->save()) {
@@ -456,12 +473,11 @@ class ModelDataGenerator
         while ($max > 0) {
             $dir = new Model\DireccionCliente();
             $dir->codcliente = $cliente->codcliente;
-            $dir->codpais = (mt_rand(0, 2) === 0) ? $this->paises[0]->codpais : AppSettings::get('default', 'codpais');
-            ;
+            $dir->codpais = (mt_rand(0, 2) === 0) ? $this->paises[0]->codpais : AppSettings::get('default', 'codpais');;
             $dir->provincia = $this->tools->provincia();
             $dir->ciudad = $this->tools->ciudad();
             $dir->direccion = $this->tools->direccion();
-            $dir->codpostal = (string) mt_rand(1234, 99999);
+            $dir->codpostal = mt_rand(1234, 99999);
             $dir->apartado = (mt_rand(0, 3) == 0) ? (string) mt_rand(1234, 99999) : null;
             $dir->domenvio = (mt_rand(0, 1) === 1);
             $dir->domfacturacion = (mt_rand(0, 1) === 1);
@@ -551,8 +567,7 @@ class ModelDataGenerator
         while ($max) {
             $dir = new Model\DireccionProveedor();
             $dir->codproveedor = $proveedor->codproveedor;
-            $dir->codpais = AppSettings::get('default', 'codpais');
-            ;
+            $dir->codpais = AppSettings::get('default', 'codpais');;
 
             if (mt_rand(0, 2) == 0) {
                 $dir->codpais = $this->paises[0]->codpais;
@@ -561,7 +576,7 @@ class ModelDataGenerator
             $dir->provincia = $this->tools->provincia();
             $dir->ciudad = $this->tools->ciudad();
             $dir->direccion = $this->tools->direccion();
-            $dir->codpostal = (string) mt_rand(1234, 99999);
+            $dir->codpostal = mt_rand(1234, 99999);
 
             if (mt_rand(0, 3) == 0) {
                 $dir->apartado = (string) mt_rand(1234, 99999);

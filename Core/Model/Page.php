@@ -108,7 +108,7 @@ class Page
      */
     public function install()
     {
-        return 'INSERT INTO ' . static::tableName() . " (name,title) VALUES ('Wizard','Wizard');";
+        return 'INSERT INTO ' . static::tableName() . " (name,title) VALUES ('AdminHome','AdminHome');";
     }
 
     /**

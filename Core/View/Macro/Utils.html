@@ -29,8 +29,12 @@
 {% macro exportData(fsc, i18n, type = 'list') %}
 {% from 'Macro/Utils.html' import popoverTitle as popoverTitle %}
 {% set print, print_title = i18n.trans('print'), i18n.trans('print-data-records') %}
+{% set email_title = i18n.trans('send-to-email-button') %}
 
 <div class="btn-group">
+    <a href="#" onclick="goToEmail('{{ fsc.exportManager.defaultOption() }}')" id="b_email" class="btn btn-sm btn-secondary">
+        <i class="fa fa-envelope-o" aria-hidden="true"></i> {{ email_title }}
+    </a>
     {% if type == 'list' %}
     <a href="#" onclick="goToExport('{{ fsc.exportManager.defaultOption() }}')" id="b_print" class="btn btn-sm btn-secondary" {{ popoverTitle(print_title, 'bottom') }}>
     {% else %}
@@ -53,5 +57,6 @@
             </a>
         {% endfor %}
     </div>
+
 </div>
 {% endmacro %}

@@ -1,7 +1,7 @@
 <?php
 /**
  * This file is part of FacturaScripts
- * Copyright (C) 2017-2018  Carlos Garcia Gomez  <carlos@facturascripts.com>
+ * Copyright (C) 2013-2017  Carlos Garcia Gomez  <carlos@facturascripts.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -16,15 +16,14 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 namespace FacturaScripts\Core\Lib\ExtendedController;
 
 use FacturaScripts\Core\Base;
 use FacturaScripts\Core\Base\DataBase\DataBaseWhere;
 use FacturaScripts\Core\Lib\ExportManager;
-use FacturaScripts\Core\Model\CodeModel;
 use FacturaScripts\Core\Model\User;
 use Symfony\Component\HttpFoundation\Response;
-
 /**
  * Controller that lists the data in table mode
  *
@@ -40,13 +39,6 @@ abstract class ListController extends Base\Controller
      * @var string
      */
     public $active;
-    
-    /**
-     * Model to use with select and autocomplete filters.
-     *
-     * @var CodeModel
-     */
-    public $codeModel;
 
     /**
      * Object to export data
@@ -54,13 +46,6 @@ abstract class ListController extends Base\Controller
      * @var ExportManager
      */
     public $exportManager;
-
-    /**
-     * List of icons for each of the views
-     *
-     * @var array
-     */
-    public $icons;
 
     /**
      * First row to select from the database
@@ -83,6 +68,13 @@ abstract class ListController extends Base\Controller
     public $views;
 
     /**
+     * List of icons for each of the views
+     *
+     * @var array
+     */
+    public $icons;
+
+    /**
      * Inserts the views to display
      */
     abstract protected function createViews();
@@ -101,13 +93,12 @@ abstract class ListController extends Base\Controller
 
         $this->setTemplate('Master/ListController');
 
-        $this->active = $this->request->get('active', '');
-        $this->codeModel = new CodeModel();
         $this->exportManager = new ExportManager();
-        $this->icons = [];
+        $this->active = $this->request->get('active', '');
         $this->offset = (int) $this->request->get('offset', 0);
         $this->query = $this->request->get('query', '');
         $this->views = [];
+        $this->icons = [];
     }
 
     /**
@@ -145,7 +136,7 @@ abstract class ListController extends Base\Controller
             $this->views[$key]->setSelectedOrderBy($orderKey);
 
             // Load data using filter and order
-            $listView->loadData(false, $where, [], $this->getOffSet($key), Base\Pagination::FS_ITEM_LIMIT);
+            $listView->loadData($where, $this->getOffSet($key), Base\Pagination::FS_ITEM_LIMIT);
         }
 
         // Operations with data, after execute action
@@ -174,36 +165,23 @@ abstract class ListController extends Base\Controller
     protected function execAfterAction($action)
     {
         switch ($action) {
-            case 'autocomplete':
-                $this->autocompleteAction();
-                break;
-
             case 'export':
                 $this->setTemplate(false);
                 $this->exportManager->newDoc($this->response, $this->request->get('option'));
                 $this->views[$this->active]->export($this->exportManager);
                 $this->exportManager->show($this->response);
                 break;
-
+            case 'email':
+                $this->setTemplate(false);
+                $this->exportManager->newDoc($this->response, $this->request->get('option'));
+                $this->views[$this->active]->export($this->exportManager);
+                $file = $this->exportManager->save($this->response);
+                $this->response->headers->set('Refresh', '1; index.php?page=SendEmail&file='.$file);
+                break;
             case 'megasearch':
                 $this->megaSearchAction();
                 break;
         }
-    }
-
-    private function autocompleteAction()
-    {
-        $this->setTemplate(false);
-        $source = $this->request->get('source');
-        $field = $this->request->get('field');
-        $title = $this->request->get('title');
-        $term = $this->request->get('term');
-        
-        $results = [];
-        foreach($this->codeModel->search($source, $field, $title, $term) as $value) {
-            $results[] = ['key' => $value->code, 'value' => $value->description];
-        }
-        $this->response->setContent(json_encode($results));
     }
 
     /**
@@ -236,6 +214,28 @@ abstract class ListController extends Base\Controller
         }
 
         return false;
+    }
+
+    /**
+     * Returns columns title for megaSearchAction function.
+     *
+     * @param ListView $view
+     * @param int $maxColumns
+     *
+     * @return array
+     */
+    private function getTextColumns($view, $maxColumns)
+    {
+        $result = [];
+        foreach ($view->getColumns() as $col) {
+            if ($col->display !== 'none' && in_array($col->widget->type, ['text', 'money'], false)) {
+                $result[] = $col->widget->fieldName;
+                if (count($result) === $maxColumns) {
+                    break;
+                }
+            }
+        }
+        return $result;
     }
 
     /**
@@ -281,28 +281,6 @@ abstract class ListController extends Base\Controller
         }
 
         $this->response->setContent(json_encode($json));
-    }
-
-    /**
-     * Returns columns title for megaSearchAction function.
-     *
-     * @param ListView $view
-     * @param int $maxColumns
-     *
-     * @return array
-     */
-    private function getTextColumns($view, $maxColumns)
-    {
-        $result = [];
-        foreach ($view->getColumns() as $col) {
-            if ($col->display !== 'none' && in_array($col->widget->type, ['text', 'money'], false)) {
-                $result[] = $col->widget->fieldName;
-                if (count($result) === $maxColumns) {
-                    break;
-                }
-            }
-        }
-        return $result;
     }
 
     /**
@@ -384,21 +362,6 @@ abstract class ListController extends Base\Controller
     }
 
     /**
-     * Add an autocomplete type filter to a table
-     *
-     * @param string $indexView
-     * @param string $key (Filter field name identifier)
-     * @param string $table (Table name)
-     * @param string $where (Where condition for table)
-     * @param string $field (Field of the table with the data to show)
-     */
-    protected function addFilterAutocomplete($indexView, $key, $table, $where = '', $field = '')
-    {
-        $value = $this->request->get($key);
-        $this->views[$indexView]->addFilter($key, ListFilter::newAutocompleteFilter($field, $value, $table, $where));
-    }
-
-    /**
      * Adds a boolean condition type filter
      *
      * @param string $indexView
@@ -477,6 +440,45 @@ abstract class ListController extends Base\Controller
     }
 
     /**
+     * Creates a list of data from a table
+     *
+     * @param string $field : Field name with real value
+     * @param array $options : Array with configuration values
+     *                          [field = Field description, table = table name, where = SQL Where clausule]
+     *
+     * @return array
+     */
+    public function optionlist($field, $options)
+    {
+        $result = [];
+        if ($this->dataBase->tableExists($options['table'])) {
+            $fieldList = $field;
+            if ($field !== $options['field']) {
+                $fieldList = $fieldList . ', ' . $options['field'];
+            }
+
+            $sql = 'SELECT DISTINCT ' . $fieldList
+                . ' FROM ' . $options['table']
+                . ' WHERE COALESCE(' . $options['field'] . ", '')" . " <> ''" . $options['where']
+                . ' ORDER BY ' . $options['field'] . ' ASC;';
+
+            $data = $this->dataBase->select($sql);
+            foreach ($data as $item) {
+                $value = $item[$options['field']];
+                if ($value !== '') {
+                    /**
+                     * If the key is  mb_strtolower($item[$field], 'UTF8') then we can't filter by codserie, codalmacen,
+                     * etc.
+                     */
+                    $result[$item[$field]] = $value;
+                }
+            }
+        }
+
+        return $result;
+    }
+
+    /**
      * Returns the offset value for the specified view
      *
      * @param string $indexView
@@ -548,4 +550,5 @@ abstract class ListController extends Base\Controller
         }
         return $result;
     }
+
 }

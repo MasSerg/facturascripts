@@ -107,17 +107,13 @@ class EditView extends BaseView
             $column->widget->readOnly = $disabled;
         }
     }
-    
+
     /**
-     * Load the data in the model property, according to the code specified.
-     * 
-     * @param mixed $code
-     * @param DataBaseWhere[] $where
-     * @param array $order
-     * @param int $offset
-     * @param int $limit
+     * Establishes and loads the model data according to its Primary Key
+     *
+     * @param string|array $code
      */
-    public function loadData($code = false, $where = [], $order = [], $offset = 0, $limit = FS_ITEM_LIMIT)
+    public function loadData($code)
     {
         if ($this->newCode !== null) {
             $code = $this->newCode;
@@ -136,7 +132,7 @@ class EditView extends BaseView
         $fieldName = $this->model->primaryColumn();
         $this->count = empty($this->model->{$fieldName}) ? 0 : 1;
 
-        /// if not a new reg. we lock primary key
+        // Bloqueamos el campo Primary Key si no es una alta
         $column = $this->columnForField($fieldName);
         if (!empty($column)) {
             $column->widget->readOnly = ($this->count > 0);

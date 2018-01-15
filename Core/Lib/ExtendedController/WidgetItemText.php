@@ -84,9 +84,10 @@ class WidgetItemText extends WidgetItem
 
         switch ($this->type) {
             case 'textarea':
+                $fieldName = '"' . $this->fieldName . '"';
                 $html = $this->getIconHTML()
-                    . '<textarea name="' . $this->fieldName . '" id="' . $this->fieldName
-                    . '" class="form-control" rows="3" ' . $specialAttributes
+                    . '<textarea name=' . $fieldName . ' id=' . $fieldName
+                    . ' class="form-control" rows="3" ' . $specialAttributes
                     . '>' . $value . '</textarea>';
 
                 if (!empty($this->icon)) {

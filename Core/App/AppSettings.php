@@ -99,7 +99,7 @@ class AppSettings
             'FS_ITEM_LIMIT' => ['property' => 'item_limit', 'default' => 50],
         ];
         $this->setConstants($constants);
-        static::get('default', 'homepage', 'Wizard');
+        static::get('default', 'homepage', 'AdminHome');
 
         if (self::$save) {
             $this->save();
@@ -113,7 +113,7 @@ class AppSettings
     {
         foreach (self::$data as $key => $value) {
             $settings = new Settings();
-            $settings->name = (string) $key;
+            $settings->name = $key;
             $settings->properties = $value;
             $settings->save();
         }

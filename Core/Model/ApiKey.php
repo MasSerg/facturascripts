@@ -97,7 +97,7 @@ class ApiKey
         $this->id = null;
         $this->apikey = '';
         $this->descripcion = '';
-        $this->enabled = false;
+        $this->enabled = FALSE;
         $this->f_alta = date('d-m-Y');
         $this->f_baja = null;
         $this->nick = null;

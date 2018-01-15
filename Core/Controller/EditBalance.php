@@ -58,7 +58,7 @@ class EditBalance extends ExtendedController\PanelController
             case 'EditBalanceCuentaA':
                 $codbalance = $this->getViewModelValue('EditBalance', 'codbalance');
                 $where = [new DataBaseWhere('codbalance', $codbalance)];
-                $view->loadData(false, $where);
+                $view->loadData($where);
                 break;
         }
     }

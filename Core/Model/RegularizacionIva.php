@@ -1,7 +1,7 @@
 <?php
 /**
  * This file is part of FacturaScripts
- * Copyright (C) 2014-2018  Carlos Garcia Gomez  <carlos@facturascripts.com>
+ * Copyright (C) 2014-2017  Carlos Garcia Gomez  <carlos@facturascripts.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -17,8 +17,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 namespace FacturaScripts\Core\Model;
-
-use FacturaScripts\Core\Base\DataBase\DataBaseWhere;
 
 /**
  * A VAT regularization.
@@ -109,7 +107,7 @@ class RegularizacionIva
         if ($this->idasiento !== null) {
             $partida = new Partida();
 
-            return $partida->all([new DataBaseWhere('idasiento', $this->idasiento)]);
+            return $partida->allFromAsiento($this->idasiento);
         }
 
         return false;

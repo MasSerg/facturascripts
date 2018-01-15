@@ -80,8 +80,25 @@ class PDFExport implements ExportInterface
             $this->newPage();
             $this->pdf->ezText('');
         }
-
         return $this->pdf->ezStream(['Content-Disposition' => 'doc_' . mt_rand(1, 999999) . '.pdf']);
+    }
+
+    /**
+     * Return the file .
+     *
+     * @return string
+     */
+    public function saveDoc()
+    {
+        if ($this->pdf === null) {
+            $this->newPage();
+            $this->pdf->ezText('');
+        }
+
+        $this->file = "doc_".md5(uniqid()).".pdf";
+        file_put_contents(__DIR__."/../../../data/$this->file",$this->pdf->output());
+
+        return $this->file;
     }
 
     /**

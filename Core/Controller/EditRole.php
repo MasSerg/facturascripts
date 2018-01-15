@@ -62,7 +62,7 @@ class EditRole extends ExtendedController\PanelController
             case 'ListRoleAccess':
                 $codrol = $this->getViewModelValue('EditRole', 'codrol');
                 $where = [new DataBaseWhere('codrol', $codrol)];
-                $view->loadData(false, $where);
+                $view->loadData($where);
                 break;
         }
     }

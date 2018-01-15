@@ -66,6 +66,43 @@
         {% endif %}
 {% endmacro %}
 
+{#    /**
+    * Creates an textarea form element
+    *
+    * @param string $id element id attribute.
+    * @param string $name element name attribute.
+    * @param string $value the default value for the textarea.
+    * @param string $label NULL if no label is set. This will add a <label> element with the string as its contents.
+        * @param string $icon string identifying a FontAwesome icon (http://fontawesome.io/icons/).
+        * @param array  $attributes an associative array of strings, extra attributes with their values
+        *               (https://www.w3.org/TR/2017/REC-html52-20171214/sec-forms.html#the-input-element)
+        *               it shouldn't be 'type', 'id' or 'name', as those are already given.
+        */
+        #}
+        {% macro simpleTextarea(id, name, value, label = NULL, icon = NULL, attributes = NULL) %}
+        {% if label %}
+        <label for="{{ name }}">{{ label }}</label>
+        {% endif %}
+
+        {% if icon %}
+        <div class="input-group">
+                <span class="input-group-addon">
+                    <i class="fa {{ icon }} fa-fw" aria-hidden="true"></i>
+                </span>
+            {% endif %}
+
+            <textarea id="{{ id }}" name="{{ name }}"
+                   {% if attributes.class is not defined %}
+                   class="form-control"
+                   {% endif %}
+
+                   {% for attribute,attrValue in attributes %}
+                   {{ attribute }}="{{ attrValue }}"
+                   {% endfor %} >{{ value }}</textarea>
+            {% if icon %}
+        </div>
+        {% endif %}
+        {% endmacro %}
 {#   /**
      * Creates a Select form element
      *

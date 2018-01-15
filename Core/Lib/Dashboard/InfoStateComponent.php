@@ -47,7 +47,7 @@ class InfoStateComponent extends BaseComponent implements ComponentInterface
      */
     public function __construct($data, $userNick)
     {
-        parent::__construct($data, null);
+        parent::__construct($data, NULL);
         $this->group = [];
         $this->detail = [];
     }
@@ -129,7 +129,7 @@ class InfoStateComponent extends BaseComponent implements ComponentInterface
     {
         $newItem = new Model\DashboardData();
         $newItem->component = 'InfoState';
-        $newItem->nick = null;
+        $newItem->nick = NULL;
 
         if (isset($data['id'])) {
             $newItem->id = $data['id'];
