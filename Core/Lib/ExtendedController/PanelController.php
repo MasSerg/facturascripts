@@ -285,7 +285,9 @@ abstract class PanelController extends Base\Controller
             case 'email':
                 $this->setTemplate(false);
                 $this->exportManager->newDoc($this->response, $this->request->get('option'));
-                $this->views[$this->active]->export($this->exportManager);
+                foreach ($this->views as $selectedView) {
+                    $selectedView->export($this->exportManager);
+                }
                 $file = $this->exportManager->save($this->response);
                 $this->response->headers->set('Refresh', '1; index.php?page=SendEmail&file='.$file);
                 break;

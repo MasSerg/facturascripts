@@ -48,7 +48,6 @@
         $('#formSearch' + tabActive).append('<input type="hidden" name="action" value="email"/>'
             + '<input type="hidden" name="option" value="' + option + '"/>');
         $('#formSearch' + tabActive).submit();
-
     }
     function deleteFromList() {
         var deleteCodes = [];
@@ -131,7 +130,7 @@
 {% from 'Macro/Utils.html' import popoverTitle as popoverTitle %}
 {% from 'Macro/Utils.html' import message as show_message %}
 {% from 'Macro/Utils.html' import exportData as exportData %}
-{% from 'Macro/Utils.html' import emailButton as emailButton %}
+{% from 'Macro/Utils.html' import sendEmail as sendEmail %}
 {% from 'Macro/BaseController.html' import buttonOrderBy as buttonOrderBy %}
 {% from 'Macro/BaseController.html' import columnsForListView as columnsForListView %}
 {% from 'Macro/BaseController.html' import filterForSelectInput as filterForSelectInput %}
@@ -176,6 +175,7 @@
                 </a>
                 {# Adds print and export options #}
                 {{ exportData(fsc, i18n) }}
+                {{ sendEmail(fsc, i18n) }}
             </div>
         </div>
         <div class="col-sm-5 col-6 text-right">

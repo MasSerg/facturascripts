@@ -48,6 +48,7 @@ class SendEmail extends Controller
             $this->subject = $this->request->request->get('subject');
             $this->text = $this->request->request->get('text');
             $this->file = $this->request->request->get('file');
+            $this->referer = $this->request->request->get('referer');
 
             // Create views to show
             $this->sendEmail();
@@ -56,6 +57,7 @@ class SendEmail extends Controller
             $this->name = $user->nick;
             $this->from = $user->email;
             $this->file = $this->request->get('file');
+            $this->referer = $this->request->headers->get('referer');
         }
     }
 
@@ -98,7 +100,8 @@ class SendEmail extends Controller
             } else {
                 $this->miniLog->info($this->i18n->trans('send-mail-success'));
                 unlink(realpath(__DIR__."/../../data/$this->file"));
-                $this->response->headers->set('Refresh', '1; index.php?page=ListFamilia');
+                $referer = explode('&',$this->referer);
+                $this->response->headers->set('Refresh', '1; '.$referer[0]);//index.php?page=ListFamilia');
             }
     }
 

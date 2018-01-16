@@ -39,7 +39,6 @@
     function insertRecord() {
         document.insert_form.submit();
     }
-
     function deleteRecord() {
         bootbox.confirm({
             title: "{{ i18n.trans('confirm-delete')|raw }}",
@@ -71,6 +70,7 @@
     $(document).ready(function () {
         $('#main_row :text:first').focus();
     });
+    }
 </script>
 {% endblock %}
 
@@ -102,6 +102,7 @@
 {# Visual macros #}
 {% from 'Macro/Utils.html' import popoverTitle as popoverTitle %}
 {% from 'Macro/Utils.html' import exportData as exportData %}
+{% from 'Macro/Utils.html' import sendEmail as sendEmail %}
 {% from 'Macro/BaseController.html' import columnsForEditView as columnsForEditView %}
 {% from 'Macro/BaseController.html' import rowStatisticsForEditView as rowStatisticsForEditView %}
 {% from 'Macro/BaseController.html' import rowCardsForEditView as rowCardsForEditView %}
@@ -133,6 +134,7 @@
                 </a>
                 {# Adds print and export options #}
                 {{ exportData(fsc, i18n, 'edit') }}
+                {{ sendEmail(fsc, i18n, 'edit') }}
             </div>
         </div>
 

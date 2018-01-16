@@ -98,6 +98,7 @@
 {# -- Visual macros -- #}
 {% from 'Macro/Utils.html' import popoverTitle as popoverTitle %}
 {% from 'Macro/Utils.html' import exportData as exportData %}
+{% from 'Macro/Utils.html' import sendEmail as sendEmail %}
 {% from 'Macro/BaseController.html' import columnsForListView as columnsForListView %}
 {% from 'Macro/BaseController.html' import columnsForEditListView as columnsForEditListView %}
 {% from 'Macro/BaseController.html' import columnsForEditView as columnsForEditView %}
@@ -128,6 +129,7 @@
                 </a>
                 {# -- Adds print and export options -- #}
                 {{ exportData(fsc, i18n, 'edit') }}
+                {{ sendEmail(fsc, i18n, 'edit') }}
             </div>
         </div>
         <div class="col-6 text-right">

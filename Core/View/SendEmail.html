@@ -77,7 +77,8 @@ $(document).ready(function(){
                 </div>
                 <div class="form-group">
                     {{ forms.simpleInput('file', 'file', fsc.file, 'hidden', '', '') }}
-                    <a href="data/{{ fsc.file }}">
+                    {{ forms.simpleInput('referer', 'referer', fsc.referer, 'hidden', '', '') }}
+                    <a href="data/{{ fsc.file }}" target="_blank">
                         <i class="fa fa-file-pdf-o" aria-hidden="true"></i> {{ fsc.file }}
                     </a>
                 </div>

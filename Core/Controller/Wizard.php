@@ -50,11 +50,11 @@ class Wizard extends Controller
 
         return $paises;
     }
-    
+
     public function privateCore(&$response, $user, $permissions)
     {
         parent::privateCore($response, $user, $permissions);
-        
+
         $codpais = $this->request->request->get('codpais','');
         if($codpais !== '') {
             $appSettings = new AppSettings();
